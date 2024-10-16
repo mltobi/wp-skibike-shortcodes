@@ -28,13 +28,26 @@ function func_list_orders_of_product($atts)
     $retStr = $retStr . '    <option value=\'\'>Bitte Fahrt ausw&auml;hlen</option>';
 
     // add all product to selection field
+    $product_list = array();
+    $product_data_list = array();
+
     foreach ($products as $product) {
         $product_data = $product->get_data();
-        $retStr = $retStr . '    <option value="' . $product->get_id() . '">' . $product_data['name'] . '</option>';
+        $product_list[$product_data['sku']] = $product;
+        $product_data_list[$product_data['sku']] = $product_data;
+    }
+    for ($idx = 0; $idx <= count($product_list); $idx++) {
+        $product = $product_list[$idx];
+        $product_data = $product_data_list[$idx];
+        if ($product_data) {
+            $retStr = $retStr . '    <option value="' . $product->get_id() . '">' . $product_data['name'] . '</option>';
+            //$retStr = $retStr . '    <pre>' . $product_data['name'] . '</pre>';
+        }
     }
 
     $retStr = $retStr . '  </select>';
     $retStr = $retStr . '</form>';
+    //$retStr = $retStr . '<pre>' . print_r($product_list, true) . '</pre>';
 
     // show orders for selected product
     if ($product_selected != -1) {
