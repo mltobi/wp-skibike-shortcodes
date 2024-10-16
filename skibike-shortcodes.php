@@ -47,6 +47,7 @@ function func_list_orders_of_product($atts)
         }
 
         $retStr = $retStr . '<h3>Ausgew&auml;hlte Fahrt: <i>' . $product_id2name[$product_selected] . '</i></h3>';
+        $retStr = $retStr . '<p>Hinweis: Die Tabelle hat weitere Spalten weiter rechts -> Scrollbar am unteren Rand der Tabelle verwenden.</p>';
 
         // get all orders
         $orders = wc_get_orders(array('numberposts' => -1));
@@ -97,17 +98,21 @@ function func_list_orders_of_product($atts)
                             $table_header = 1;
                             $retStr = $retStr . '<tr style="background-color:lightgrey;">';
                             $retStr = $retStr . $html_th . 'Rechnungsnr.</th>';
-                            $retStr = $retStr . $html_th . 'Anmelder</th>';
-                            $retStr = $retStr . $html_th . 'Menge</th>';
                             // add header for custom field data dependent columns
                             foreach ($item_values->get_meta_data('') as $meta_data) {
                                 if (!str_starts_with($meta_data->key, '_')) {
-                                    $retStr = $retStr . $html_th . $meta_data->key . '</th>';
+                                    if (!str_starts_with($meta_data->key, 'Preis')) {
+                                        $retStr = $retStr . $html_th . $meta_data->key . '</th>';
+                                    }
                                 }
                             }
                             $retStr = $retStr . $html_th . 'E-Mail</th>';
                             $retStr = $retStr . $html_th . 'Telefon</th>';
+                            $retStr = $retStr . $html_th . 'Hinweis</th>';
+                            $retStr = $retStr . $html_th . 'Preis</th>';
                             $retStr = $retStr . $html_th . 'Status</th>';
+                            $retStr = $retStr . $html_th . 'Anmelder</th>';
+                            $retStr = $retStr . $html_th . 'Menge</th>';
                             $retStr = $retStr . '</tr>';
                         }
 
@@ -116,19 +121,26 @@ function func_list_orders_of_product($atts)
                             // add order item data
                             $retStr = $retStr . '<tr>';
                             $retStr = $retStr . $html_td . pdf_download_link($invoice_number, $order_data['id']) . '</td>';
-                            $retStr = $retStr . $html_td . $order_data['billing']['first_name'] . ' ' . $order_data['billing']['last_name'] . '</td>';
-                            $retStr = $retStr . $html_td . $item_values['quantity'] . '</td>';
 
                             // add custom field data
+                            $price = '';
                             foreach ($item_values->get_meta_data('') as $meta_data) {
                                 if (!str_starts_with($meta_data->key, '_')) {
-                                    $retStr = $retStr . $html_td . $meta_data->value . '</td>';
+                                    if (!str_starts_with($meta_data->key, 'Preis')) {
+                                        $retStr = $retStr . $html_td . $meta_data->value . '</td>';
+                                    } else {
+                                        $price = $meta_data->value;
+                                    }
                                 }
                             }
 
                             $retStr = $retStr . $html_td . '<a href="mailto:' . $order_data['billing']['email'] . '">' . $order_data['billing']['email'] . '</a></td>';
                             $retStr = $retStr . $html_td . '<a href="tel:' . $order_data['billing']['phone'] . '">' . $order_data['billing']['phone'] . '</a></td>';
+                            $retStr = $retStr . $html_td . $order_data['customer_note'] . '</td>';
+                            $retStr = $retStr . $html_td . $price . '</td>';
                             $retStr = $retStr . $html_td . $order_data['status'] . '</td>';
+                            $retStr = $retStr . $html_td . $order_data['billing']['first_name'] . ' ' . $order_data['billing']['last_name'] . '</td>';
+                            $retStr = $retStr . $html_td . $item_values['quantity'] . '</td>';
 
                             $retStr = $retStr . '</tr>';
                         }
